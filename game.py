@@ -1,6 +1,7 @@
 import pygame
 import sys
 from ship import Ship
+from island import Island
 
 tile_size = 64
 window_size = 10 * tile_size
@@ -12,31 +13,22 @@ water_rect = water.get_rect()
 screen_rect = screen.get_rect()
 
 # adding the island
-top_left = pygame.image.load('assets/top_left.png')
-top_right = pygame.image.load('assets/top_right.png')
-bottom_left = pygame.image.load('assets/bottom_left.png')
-bottom_right = pygame.image.load('assets/bottom_right.png')
-
+island = Island()
+island.move((300,300))
 num_tiles = screen_rect.width // water_rect.width
 
 
 def draw_bg():
-
     for y in range(num_tiles):
         for x in range(num_tiles):
             screen.blit(water, (x*water_rect.width, y*water_rect.height))
-
-    screen.blit(top_left, (260, 200))
-    screen.blit(top_right, (324, 200))
-    screen.blit(bottom_left, (260, 264))
-    screen.blit(bottom_right, (324, 264))
-
 
 # adding a ship
 ship = Ship()
 screen.blit(ship.image, (340, 400))
 
 coordinate = (0, 0)
+clock = pygame.time.Clock()
 
 while True:  # Check for user input
     for event in pygame.event.get():
@@ -52,10 +44,13 @@ while True:  # Check for user input
 
     # Update game objects
     ship.move(coordinate)
+    collision = pygame.sprite.collide_rect(ship, island)
+    if collision:
+        ship.health = ship.health - 1
 
     # Draw the screen
     draw_bg()
-    # Line 59 and 60 do the same thing
+    island.draw(screen)
     ship.draw(screen)
-    screen.blit(ship.image, ship.rect)
     pygame.display.flip()
+    clock.tick(60)
